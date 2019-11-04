@@ -69,6 +69,7 @@ from openprocurement.auctions.core.utils import (
 from openprocurement.auctions.appraisal.constants import (
     DUTCH_PERIOD,
     QUICK_DUTCH_PERIOD,
+    MIN_TENDER_PERIOD_DAYS_AMOUNT,
     NUMBER_OF_STAGES,
     AUCTION_STATUSES,
     CONTRACT_TYPES,
@@ -281,12 +282,12 @@ class AppraisalAuction(BaseAuction):
 
             min_end_date_limit = calculate_business_date(
                 value['startDate'],
-                timedelta(days=7),
+                timedelta(days=MIN_TENDER_PERIOD_DAYS_AMOUNT),
                 data,
                 working_days=True
             )
             if value['endDate'] < min_end_date_limit:
-                raise ValidationError(u"tenderPeriod should be at least 7 working days")
+                raise ValidationError(u"tenderPeriod should be at least {} working days".format(MIN_TENDER_PERIOD_DAYS_AMOUNT))
 
 
     @serializable(serialized_name="minimalStep", type=ModelType(Value))

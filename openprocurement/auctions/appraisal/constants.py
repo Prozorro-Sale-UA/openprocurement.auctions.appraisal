@@ -5,6 +5,7 @@ from openprocurement.auctions.core.constants import TZ
 
 DUTCH_PERIOD = timedelta(minutes=405)
 QUICK_DUTCH_PERIOD = timedelta(minutes=10)
+MIN_TENDER_PERIOD_DAYS_AMOUNT = 1
 
 TENDER_PERIOD_STATUSES = ['active.tendering', 'active.auction']
 NUMBER_OF_STAGES = 80   # from openprocurement.auction.appraisal.constants import DUTCH_ROUNDS as NUMBER_OF_STAGES

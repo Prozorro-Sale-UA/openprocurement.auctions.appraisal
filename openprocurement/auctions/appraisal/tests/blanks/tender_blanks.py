@@ -12,6 +12,10 @@ from openprocurement.auctions.core.utils import (
     SANDBOX_MODE, TZ, get_now, calculate_business_date
 )
 
+from openprocurement.auctions.appraisal.constants import (
+    MIN_TENDER_PERIOD_DAYS_AMOUNT,
+)
+
 from openprocurement.auctions.appraisal.tests.base import TEST_ROUTE_PREFIX
 from openprocurement.auctions.appraisal.models import AppraisalAuction
 
@@ -437,15 +441,17 @@ def check_daylight_savings_timezone(self):
 
 
 def tender_period_validation(self):
-    data = deepcopy(self.initial_data)
-    data['auctionPeriod']['startDate'] = (get_now() + timedelta(days=1)).isoformat()
-    response = self.app.post_json('/auctions', {'data': data}, status=422)
-    self.assertEqual(response.status, '422 Unprocessable Entity')
-    self.assertEqual(response.content_type, 'application/json')
-    self.assertEqual(
-        response.json['errors'][0]['description'][0],
-        'tenderPeriod should be at least 7 working days'
-    )
+    # do not check the minimal tenderPeriod, while it is allowed to be 1 day only
+
+    # data = deepcopy(self.initial_data)
+    # data['auctionPeriod']['startDate'] = (get_now() + timedelta(days=1)).isoformat()
+    # response = self.app.post_json('/auctions', {'data': data}, status=422)
+    # self.assertEqual(response.status, '422 Unprocessable Entity')
+    # self.assertEqual(response.content_type, 'application/json')
+    # self.assertEqual(
+    #     response.json['errors'][0]['description'][0],
+    #     'tenderPeriod should be at least {} working days'.format(MIN_TENDER_PERIOD_DAYS_AMOUNT)
+    # )
 
     response = self.app.post_json('/auctions', {"data": self.initial_data})
     self.assertEqual(response.status, '201 Created')
@@ -455,8 +461,8 @@ def tender_period_validation(self):
         'endDate': parse_datetime(response.json['data']['tenderPeriod']['endDate']),
     }
 
-    # Check if tenderPeriod last more than 7 working days
-    expected_end_date = calculate_business_date(tender_period['startDate'], timedelta(days=7), None, working_days=True)
+    # Check if tenderPeriod last more than MIN_TENDER_PERIOD_DAYS_AMOUNT working days
+    expected_end_date = calculate_business_date(tender_period['startDate'], timedelta(days=MIN_TENDER_PERIOD_DAYS_AMOUNT), None, working_days=True)
     self.assertGreaterEqual(tender_period['endDate'], expected_end_date)
 
     if SANDBOX_MODE:
@@ -523,7 +529,7 @@ def edit_after_rectification_period(self):
     )
     fromdb.tenderPeriod.endDate = calculate_business_date(
         fromdb.tenderPeriod.startDate,
-        timedelta(days=7),
+        timedelta(days=MIN_TENDER_PERIOD_DAYS_AMOUNT),
         fromdb,
         working_days=True
     )
@@ -1617,7 +1623,7 @@ def check_bids_invalidation(self):
     )
     fromdb.tenderPeriod.endDate = calculate_business_date(
         fromdb.tenderPeriod.startDate,
-        timedelta(days=7),
+        timedelta(days=MIN_TENDER_PERIOD_DAYS_AMOUNT),
         fromdb,
         working_days=True
     )

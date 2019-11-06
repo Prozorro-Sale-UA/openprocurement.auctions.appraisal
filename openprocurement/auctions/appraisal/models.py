@@ -266,7 +266,9 @@ class AppraisalAuction(BaseAuction):
             role = 'concierge'
         else:
             role = 'edit_{}'.format(request.context.status)
-            if request.context.status == 'active.tendering' and get_now() < self.rectification_period.endDate:
+            rectification_period_exists = self.rectification_period.endDate is not None
+            rectification_period_not_finished = rectification_period_exists and get_now() < self.rectification_period.endDate
+            if request.context.status == 'active.tendering' and rectification_period_not_finished:
                 role += '_during_rectification_period'
         return role
 

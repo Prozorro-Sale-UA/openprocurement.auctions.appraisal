@@ -1482,6 +1482,7 @@ def patch_auction(self):
     )
     auction = response.json['data']
     dateModified = auction.pop('dateModified')
+    auction['rectificationPeriod'].pop('invalidationDate')
 
     response = self.app.patch_json('/auctions/{}?acc_token={}'.format(auction['id'], owner_token),
                                    {'data': {'status': 'cancelled'}})
@@ -1509,6 +1510,7 @@ def patch_auction(self):
     self.assertEqual(response.content_type, 'application/json')
     new_auction = response.json['data']
     new_auction.pop('dateModified')
+    new_auction['rectificationPeriod'].pop('invalidationDate')
     self.assertEqual(auction, new_auction)
 
     date_modified_to_patch = (datetime.now() + timedelta(days=30)).isoformat()
@@ -1519,6 +1521,7 @@ def patch_auction(self):
     self.assertEqual(response.content_type, 'application/json')
     new_auction2 = response.json['data']
     new_dateModified2 = new_auction2.pop('dateModified')
+    new_auction2['rectificationPeriod'].pop('invalidationDate')
     self.assertEqual(new_auction, new_auction2)
     self.assertNotEqual(date_modified_to_patch, new_dateModified2)
     # self.assertEqual(new_dateModified, new_dateModified2)

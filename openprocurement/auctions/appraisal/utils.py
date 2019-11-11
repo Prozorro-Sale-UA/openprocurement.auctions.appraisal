@@ -98,7 +98,7 @@ def calc_auction_end_time(stages, start):
 
 def invalidate_bids_data(auction):
     rectification_period_exists = auction.rectification_period.endDate is not None
-    rectification_period_not_finished = rectification_period_exists and get_now() < auction.rectification_period.endDate
+    rectification_period_not_finished = rectification_period_exists and get_now() > auction.rectification_period.endDate
     if auction.status == 'active.tendering' and rectification_period_not_finished:
         return
 

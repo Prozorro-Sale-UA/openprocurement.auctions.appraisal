@@ -301,6 +301,21 @@ class AppraisalAuction(BaseAuction):
         if self.tenderPeriod:
             self.rectificationPeriod = RectificationPeriod() if not self.rectificationPeriod else self.rectificationPeriod
             self.rectificationPeriod.startDate = self.tenderPeriod.startDate
+
+            # for a new type of procedure we should allow tenderPeriod of 1 day.
+            # In this case rectificationPeriod does not exist. But if rectificationPeriod does not exist
+            # procedure is editable. To make it unchangeable,
+            # we should create rectificationPeriod with startDate == endDate == tenderPeriod.startDate
+            five_working_days_after_start_date = calculate_business_date(
+                self.tenderPeriod.startDate,
+                timedelta(days=5),
+                None,
+                working_days=True
+            )
+            if self.tenderPeriod.endDate < five_working_days_after_start_date:
+                self.rectificationPeriod.endDate = self.rectificationPeriod.startDate
+                return self.rectificationPeriod
+
             self.rectificationPeriod.endDate = calculate_business_date(
                 self.tenderPeriod.endDate.astimezone(TZ),
                 -timedelta(days=5),

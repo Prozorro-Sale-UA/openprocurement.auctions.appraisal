@@ -288,7 +288,8 @@ class AppraisalAuction(BaseAuction):
                 data,
                 working_days=True
             )
-            if value['endDate'] < min_end_date_limit:
+            sandbox_mode_with_skip_auction = SANDBOX_MODE and data.get('submissionMethodDetails') and 'quick' in data.get('submissionMethodDetails', '')
+            if value['endDate'] < min_end_date_limit and not sandbox_mode_with_skip_auction:
                 raise ValidationError(u"tenderPeriod should be at least {} working days".format(MIN_TENDER_PERIOD_DAYS_AMOUNT))
 
 

@@ -292,7 +292,6 @@ class AppraisalAuction(BaseAuction):
             if value['endDate'] < min_end_date_limit and not sandbox_mode_with_skip_auction:
                 raise ValidationError(u"tenderPeriod should be at least {} working days".format(MIN_TENDER_PERIOD_DAYS_AMOUNT))
 
-
     @serializable(serialized_name="minimalStep", type=ModelType(Value))
     def auction_minimalStep(self):
         return Value(dict(amount=0))
@@ -310,7 +309,7 @@ class AppraisalAuction(BaseAuction):
             five_working_days_after_start_date = calculate_business_date(
                 self.tenderPeriod.startDate,
                 timedelta(days=5),
-                None,
+                self,
                 working_days=True
             )
             if self.tenderPeriod.endDate < five_working_days_after_start_date:
